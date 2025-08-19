@@ -45,6 +45,9 @@ spotify_df["popularity_bin"] = pd.cut(
     labels=range(1, 11),  # etiquetas 1–10
     ordered=True,
 )
+# Crear una columna de año de lanzamiento
+spotify_df["release_year"] = spotify_df["release_date"].dt.year
+
 
 # Top 10 canciones más escuchadas del 2024
 top_10_songs = (
@@ -58,10 +61,15 @@ top_10_songs["track"] = pd.Categorical(
 )
 order_rev = order[::-1]
 
+# Mostrar datos de Spotify
+st.subheader("Datos de Spotify")
+st.dataframe(spotify_df.head())
+
+# Botón para mostrar el gráfico de barras
 bar_button = st.button("Mostrar Top 10 Canciones", key="top_10_songs")
 
 if bar_button:
-    st.write("Top 10 Canciones Más Escuchadas en Spotify 2024")
+    st.write("Creación del Gráfico de Barras con las 10 canciones más escuchadas")
     fig = px.bar(
         top_10_songs,
         y="track",
@@ -78,3 +86,34 @@ if bar_button:
         color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     st.plotly_chart(fig, use_container_width=True)
+
+# Botón para mostrar el histograma de Streams según Popularidad
+
+hist_button = st.button(
+    "Mostrar Histograma de Streams por Popularidad", key="histogram"
+)
+
+if hist_button:
+    st.write("Creación del Histograma de Streams por Popularidad")
+    fig = px.histogram(
+        spotify_df,
+        x="spotify_streams",
+        nbins=50,
+        color="popularity_bin",
+        category_orders={"popularity_bin": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
+        title="Streams según Popularidad (1–10)",
+        color_discrete_sequence=px.colors.sequential.Viridis,
+    )
+
+fig.update_layout(
+    xaxis_title="Número de Streams",
+    yaxis_title="Número de Canciones",
+    legend_title="Popularidad",
+)
+
+
+fig.update_traces(
+    marker=dict(
+        line=dict(width=1, color="black")  # grosor del borde  # color del borde
+    )
+)
