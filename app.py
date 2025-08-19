@@ -80,7 +80,7 @@ if bar_button:
         title="Top 10 Canciones Más Escuchadas en 2024",
         labels={
             "track": "Canción",
-            "spotify_streams": "Número de Streams",
+            "spotify_streams": "Streams",
             "artist": "Artista",
         },
         color_discrete_sequence=px.colors.qualitative.Pastel,
@@ -104,16 +104,31 @@ if hist_button:
         title="Streams según Popularidad (1–10)",
         color_discrete_sequence=px.colors.sequential.Viridis,
     )
-
-fig.update_layout(
-    xaxis_title="Número de Streams",
-    yaxis_title="Número de Canciones",
-    legend_title="Popularidad",
-)
-
-
-fig.update_traces(
-    marker=dict(
-        line=dict(width=1, color="black")  # grosor del borde  # color del borde
+    fig.update_layout(
+        xaxis_title="Número de Streams",
+        yaxis_title="Número de Canciones",
+        legend_title="Popularidad",
     )
-)
+    fig.update_traces(marker=dict(line=dict(width=1, color="black")))
+
+    st.plotly_chart(fig, use_container_width=True)
+
+scatter_button = st.button("Mostrar Gráfico de Dispersión", key="scatter_plot")
+
+if scatter_button:
+    st.write("Creación del Gráfico de Dispersión")
+    fig = px.scatter(
+        spotify_df,
+        x="release_year",
+        y="spotify_streams",
+        color="popularity_bin",  # para darle un gradiente de color
+        size="popularity_bin",  # tamaño según
+        category_orders={"popularity_bin": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
+        title="Año de Lanzamiento vs Streams(log) en Spotify",
+        opacity=0.4,
+        color_discrete_sequence=px.colors.qualitative.Bold,
+    )
+    fig.update_layout(xaxis_title="Año de Lanzamiento", legend_title="Popularidad")
+
+    fig.update_yaxes(type="log", title="Número de Streams (log)")
+    st.plotly_chart(fig, use_container_width=True)
